@@ -25,7 +25,7 @@ FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /app/index.ts .
 COPY --from=prerelease /app/package.json .
-
+COPY --from=prerelease /app/src ./src
 # Expose the port the app runs on
 EXPOSE 3000
 
