@@ -1,6 +1,6 @@
 const config = {
   baseurl: 'https://aniwatch.co.at',
-  baseurl2: 'https://aniwatchtv.to',
+  baseurl2: 'https://aniwatch.co.at',
   origin: '*',
   port: Number(process.env.PORT) || 5000,
 
