@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: hianime-api
+    runtime: node
+    buildCommand: bun install && bun run build
+    startCommand: bun start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ENABLE_LOGGING
+        value: "false"
