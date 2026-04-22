@@ -9,10 +9,12 @@ const config = {
   },
 
   logLevel: 'INFO',
-  enableLogging: false,
-  isProduction: true,
-  isDevelopment: false,
-  isVercel: false,
+  enableLogging: process.env.ENABLE_LOGGING === 'true',
+  isProduction: process.env.NODE_ENV === 'production',
+  isDevelopment: process.env.NODE_ENV === 'development',
+  isVercel: !!process.env.VERCEL,
+  isRender: !!process.env.RENDER,
+  environment: process.env.VERCEL ? 'vercel' : process.env.RENDER ? 'render' : 'local',
 };
 
 export default config;
