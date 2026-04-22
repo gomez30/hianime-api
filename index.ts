@@ -1,6 +1,7 @@
-import app from './src/app';
+import { createApp } from './src/createApp';
 import config from './src/config/config';
 
+const app = createApp();
 const PORT = config.port;
 
 Bun.serve({
@@ -9,4 +10,6 @@ Bun.serve({
   fetch: app.fetch,
 });
 
-console.log(`Server running at http://0.0.0.0:${PORT}`);
+console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
+console.log(`📊 Environment: ${config.environment}`);
+console.log(`🔧 Production: ${config.isProduction}`);
