@@ -1,18 +1,14 @@
 {
   "version": 2,
+  "buildCommand": "npm install && npx tsc",
+  "outputDirectory": ".",
   "env": {
     "ENABLE_LOGGING": "false"
   },
-  "builds": [
-    {
-      "src": "api/index.ts",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/api/index.ts"
+      "dest": "/api/index.js"
     }
   ]
 }
