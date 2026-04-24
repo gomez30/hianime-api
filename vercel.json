@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npx tsc",
-  "outputDirectory": ".",
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist",
   "env": {
     "ENABLE_LOGGING": "false"
   },
