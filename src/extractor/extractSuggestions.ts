@@ -1,5 +1,7 @@
 import { load } from 'cheerio';
 import { Element } from 'domhandler';
+import { extractAnimeId } from '../utils/helpers';
+import config from '../config/config';
 
 export interface Suggestion {
   title: string | null;
@@ -27,8 +29,9 @@ export const extractSuggestions = (html: string): Suggestion[] => {
       type: null,
       duration: null,
     };
-    obj.id = $(el).attr('href')?.split('/').pop()?.split('?').at(0) || null;
-    obj.poster = $(el).find('.film-poster-img').attr('data-src') || null;
+    const href = $(el).attr('href') || '';
+    obj.id = extractAnimeId(href) || null;
+    obj.poster = $(el).find('.film-poster img').attr('data-src') || null;
     const titleEL = $(el).find('.film-name');
     obj.title = titleEL.text() || null;
     obj.alternativeTitle = titleEL.attr('data-jname') || null;

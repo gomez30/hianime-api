@@ -1,6 +1,8 @@
 import { load } from 'cheerio';
 import { Element } from 'domhandler';
 import { AnimeFeatured, TrendingAnime } from '../types/anime';
+import { extractAnimeId } from '../utils/helpers';
+import config from '../config/config';
 
 export interface ListPageResponse {
   pageInfo: {
@@ -58,7 +60,7 @@ export const extractListPage = (html: string): ListPageResponse => {
         duration: null,
       };
 
-      obj.poster = $(el).find('.film-poster .film-poster-img').attr('data-src') || null;
+      obj.poster = $(el).find('.film-poster img').attr('data-src') || null;
       obj.episodes.sub = Number($(el).find('.film-poster .tick .tick-sub').text()) || null;
       obj.episodes.dub = Number($(el).find('.film-poster .tick .tick-dub').text()) || null;
 
@@ -67,13 +69,12 @@ export const extractListPage = (html: string): ListPageResponse => {
         : $(el).find('.film-poster .tick .tick-sub').text();
       obj.episodes.eps = Number(epsText) || null;
 
-      const titleEl = $(el).find('.film-detail .film-name .dynamic-name');
+      const titleEl = $(el).find('.film-name a');
 
       obj.title = titleEl.text();
       obj.alternativeTitle = titleEl.attr('data-jname') || null;
       const href = titleEl.attr('href') || '';
-      const id = href.split('/').at(-1) || '';
-      obj.id = id.includes('?ref=') ? id.split('?')[0] : id;
+      obj.id = extractAnimeId(href) || null;
 
       obj.type = $(el).find('.fd-infor .fdi-item').first().text();
       obj.duration = $(el).find('.fd-infor .fdi-duration').text();
@@ -110,11 +111,12 @@ export const extractListPage = (html: string): ListPageResponse => {
     const res = $top10
       .find(`${id} ul li`)
       .map((i: number, el: Element) => {
+        const href = $(el).find('.film-name a').attr('href') || '';
         const obj: TrendingAnime = {
           title: $(el).find('.film-name a').text() || null,
           rank: i + 1,
           alternativeTitle: $(el).find('.film-name a').attr('data-jname') || null,
-          id: $(el).find('.film-name a').attr('href')?.split('/').pop() || null,
+          id: extractAnimeId(href) || null,
           poster: $(el).find('.film-poster img').attr('data-src') || null,
         };
         return obj;

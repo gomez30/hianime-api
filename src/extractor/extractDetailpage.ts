@@ -1,8 +1,10 @@
 import { load } from 'cheerio';
 import { Element } from 'domhandler';
 import { DetailAnime, AnimeFeatured, Season } from '../types/anime';
+import { extractAnimeId } from '../utils/helpers';
+import config from '../config/config';
 
-export const extractDetailpage = (html: string): DetailAnime => {
+export const extractDetailpage = (html: string, pageUrl?: string): DetailAnime => {
   const $ = load(html);
 
   const obj: DetailAnime = {
@@ -38,34 +40,37 @@ export const extractDetailpage = (html: string): DetailAnime => {
     recommended: [],
   };
 
-  const main = $('#ani_detail .anis-content');
+  const main = $('.anisc-detail');
   const moreSeasons = $('#main-content .block_area-seasons');
   const relatedAndMostPopular = $('#main-sidebar .block_area');
   const recommended = $(
     '.block_area.block_area_category .tab-content .block_area-content .film_list-wrap .flw-item'
   );
 
-  obj.poster = main.find('.film-poster .film-poster-img').attr('src') || null;
+  obj.poster = main.find('.film-poster img').attr('data-src') || null;
   obj.is18Plus = Boolean(main.find('.film-poster .tick-rate').length > 0);
 
-  const titleEl = main.find('.anisc-detail .film-name');
+  const titleEl = main.find('.film-name');
   obj.title = titleEl.text();
   obj.alternativeTitle = titleEl.attr('data-jname') || null;
 
   const info = main.find('.film-stats .tick');
 
   obj.rating = info.find('.tick-pg').text();
-  obj.episodes.sub = Number(info.find('.tick-sub').text()) || null;
+  obj.episodes.sub = Number(main.find('.tick-sub').text()) || null;
   obj.episodes.dub = Number(info.find('.tick-dub').text()) || null;
   obj.episodes.eps = info.find('.tick-eps').length
     ? Number(info.find('.tick-eps').text()) || null
-    : Number(info.find('.tick-sub').text()) || null;
+    : Number(main.find('.tick-sub').text()) || null;
 
   obj.type = info.find('.item').first().text();
 
-  const idLink = main.find('.film-buttons .btn');
-
-  obj.id = idLink.length ? idLink.attr('href')?.split('/').at(-1) || null : null;
+  if (pageUrl) {
+    obj.id = extractAnimeId(pageUrl) || null;
+  } else {
+    const idLink = main.find('.film-buttons .btn');
+    obj.id = idLink.length ? extractAnimeId(idLink.attr('href') || '') || null : null;
+  }
 
   const moreInfo = main.find('.anisc-info-wrap .anisc-info .item');
 
@@ -74,7 +79,10 @@ export const extractDetailpage = (html: string): DetailAnime => {
 
     switch (name) {
       case 'Overview:':
-        obj.synopsis = $(el).find('.text').text().trim();
+        obj.synopsis =
+          $(el).find('.film-description .text').text().trim() ||
+          $(el).find('[class*="description"]').text().trim() ||
+          $(el).find('.text').text().trim();
         break;
       case 'Japanese:':
         obj.japanese = $(el).find('.name').text();
@@ -107,21 +115,20 @@ export const extractDetailpage = (html: string): DetailAnime => {
         obj.MAL_score = $(el).find('.name').text();
         break;
       case 'Genres:':
-        obj.genres = $(el)
-          .find('a')
+        obj.genres = $('a[href*="genre"]')
           .map((i: number, genre: Element) => $(genre).text())
           .get();
         break;
       case 'Studios:':
         obj.studios = $(el)
           .find('a')
-          .map((i: number, studio: Element) => $(studio).attr('href')?.split('/').at(-1))
+          .map((i: number, studio: Element) => extractAnimeId($(studio).attr('href') || '') || $(studio).attr('href')?.split('/').at(-1))
           .get() as string[];
         break;
       case 'Producers:':
         obj.producers = $(el)
           .find('a')
-          .map((i: number, producer: Element) => $(producer).attr('href')?.split('/').at(-1))
+          .map((i: number, producer: Element) => extractAnimeId($(producer).attr('href') || '') || $(producer).attr('href')?.split('/').at(-1))
           .get() as string[];
         break;
       default:
@@ -141,7 +148,7 @@ export const extractDetailpage = (html: string): DetailAnime => {
           isActive: false,
         };
         innerObj.title = $(el).attr('title') || null;
-        innerObj.id = $(el).attr('href')?.split('/').pop() || null;
+        innerObj.id = extractAnimeId($(el).attr('href') || '') || null;
         innerObj.alternativeTitle = $(el).find('.title').text();
         const posterStyle = $(el).find('.season-poster').attr('style');
 
@@ -177,7 +184,7 @@ export const extractDetailpage = (html: string): DetailAnime => {
         const titleEl = $(el).find('.film-name .dynamic-name');
         innerObj.title = titleEl.text();
         innerObj.alternativeTitle = titleEl.attr('data-jname') || null;
-        innerObj.id = titleEl.attr('href')?.split('/').pop() || null;
+        innerObj.id = extractAnimeId(titleEl.attr('href') || '') || null;
 
         const infor = $(el).find('.fd-infor .tick');
 
@@ -199,7 +206,7 @@ export const extractDetailpage = (html: string): DetailAnime => {
 
         innerObj.episodes.eps = Number(epsEl) || null;
 
-        innerObj.poster = $(el).find('.film-poster .film-poster-img').attr('data-src') || null;
+        innerObj.poster = $(el).find('.film-poster img').attr('data-src') || null;
 
         array.push(innerObj);
       });
@@ -226,14 +233,14 @@ export const extractDetailpage = (html: string): DetailAnime => {
       },
       is18Plus: false,
     };
-    const titleEl = $(el).find('.film-detail .film-name .dynamic-name');
+    const titleEl = $(el).find('.film-detail .film-name a');
     innerObj.title = titleEl.text();
     innerObj.alternativeTitle = titleEl.attr('data-jname') || null;
-    innerObj.id = titleEl.attr('href')?.split('/').pop() || null;
+    innerObj.id = extractAnimeId(titleEl.attr('href') || '') || null;
     innerObj.type = $(el).find('.fd-infor .fdi-item').first().text();
     innerObj.duration = $(el).find('.fd-infor .fdi-duration').text();
 
-    innerObj.poster = $(el).find('.film-poster .film-poster-img').attr('data-src') || null;
+    innerObj.poster = $(el).find('.film-poster img').attr('data-src') || null;
     innerObj.is18Plus = $(el).find('.film-poster').has('.tick-rate').length > 0;
 
     innerObj.episodes.sub = Number($(el).find('.film-poster .tick .tick-sub').text()) || null;

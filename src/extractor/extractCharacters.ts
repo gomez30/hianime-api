@@ -1,4 +1,6 @@
 import { load } from 'cheerio';
+import { extractAnimeId } from '../utils/helpers';
+import config from '../config/config';
 
 export interface Character {
   name: string | null;
@@ -67,8 +69,7 @@ export const extractCharacters = (html: string): CharactersResponse => {
     obj.name = $(characterDetail).find('.pi-detail .pi-name a').text();
     obj.role = $(characterDetail).find('.pi-detail .pi-cast').text();
     obj.id = $(characterDetail).find('.pi-avatar').length
-      ? $(characterDetail).find('.pi-avatar').attr('href')?.replace(/^\//, '').replace('/', ':') ||
-        null
+      ? extractAnimeId($(characterDetail).find('.pi-avatar').attr('href') || '') || null
       : null;
     obj.imageUrl = $(characterDetail).find('.pi-avatar img').attr('data-src') || null;
 
@@ -89,7 +90,7 @@ export const extractCharacters = (html: string): CharactersResponse => {
             cast: null,
           };
           innerObj.name = $(item).attr('title') || null;
-          innerObj.id = $(item).attr('href')?.replace(/^\//, '').replace('/', ':') || null;
+          innerObj.id = extractAnimeId($(item).attr('href') || '') || null;
           innerObj.imageUrl = $(item).find('img').attr('data-src') || null;
 
           obj.voiceActors.push(innerObj);
@@ -102,11 +103,7 @@ export const extractCharacters = (html: string): CharactersResponse => {
         cast: null,
       };
       innerObj.id = $(voiceActorsDetail).find('.pi-avatar').length
-        ? $(voiceActorsDetail)
-            .find('.pi-avatar')
-            .attr('href')
-            ?.replace(/^\//, '')
-            .replace('/', ':') || null
+        ? extractAnimeId($(voiceActorsDetail).find('.pi-avatar').attr('href') || '') || null
         : null;
       innerObj.imageUrl = $(voiceActorsDetail).find('.pi-avatar img').attr('data-src') || null;
       innerObj.name = $(voiceActorsDetail).find('.pi-avatar img').attr('alt') || null;

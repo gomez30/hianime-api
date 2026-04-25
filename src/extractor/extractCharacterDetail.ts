@@ -1,4 +1,6 @@
 import { load } from 'cheerio';
+import { extractAnimeId } from '../utils/helpers';
+import config from '../config/config';
 
 export interface AnimeAppearance {
   title: string | null;
@@ -45,11 +47,6 @@ export interface CharacterDetail {
 export const extractCharacterDetail = (html: string): CharacterDetail => {
   const $ = load(html);
 
-  const transformId = (id: string | undefined): string | null => {
-    if (!id) return null;
-    return id.replace(/^\//, '').replace('/', ':');
-  };
-
   const whoIsHe =
     $('nav .breadcrumb .active').prev().find('a').text() === 'People' ? 'people' : 'character';
 
@@ -83,9 +80,9 @@ export const extractCharacterDetail = (html: string): CharacterDetail => {
       const titleEl = $(el).find('.dynamic-name');
       innerObj.title = titleEl.attr('title') || null;
       innerObj.alternativeTitle = titleEl.attr('data-jname') || null;
-      innerObj.id = transformId(titleEl.attr('href'));
+      innerObj.id = extractAnimeId(titleEl.attr('href') || '') || null;
 
-      innerObj.poster = $(el).find('.film-poster .film-poster-img').attr('src') || null;
+      innerObj.poster = $(el).find('.film-poster img').attr('data-src') || null;
       innerObj.role = $(el).find('.fd-infor .fdi-item').first().text().split(' ').shift() || null;
       innerObj.type = $(el).find('.fd-infor .fdi-item').last().text();
 
@@ -102,7 +99,7 @@ export const extractCharacterDetail = (html: string): CharacterDetail => {
       };
       innerObj.imageUrl = $(el).find('.pi-avatar img').attr('src') || null;
       innerObj.name = $(el).find('.pi-name a').text();
-      innerObj.id = transformId($(el).find('.pi-name a').attr('href'));
+      innerObj.id = extractAnimeId($(el).find('.pi-name a').attr('href') || '') || null;
 
       innerObj.language = $(el).find('.pi-cast').text();
 
@@ -130,12 +127,12 @@ export const extractCharacterDetail = (html: string): CharacterDetail => {
       };
 
       innerObj.anime.title = animeInfo.find('.pi-name a').text().trim();
-      innerObj.anime.id = animeInfo.find('.pi-name a').attr('href')?.split('/').pop() || null;
+      innerObj.anime.id = extractAnimeId(animeInfo.find('.pi-name a').attr('href') || '') || null;
       innerObj.anime.poster = animeInfo.find('.pi-avatar img').attr('src') || null;
       innerObj.anime.typeAndYear = animeInfo.find('.pi-cast').text().trim();
 
       innerObj.character.name = characterInfo.find('.pi-name a').text().trim();
-      innerObj.character.id = transformId(characterInfo.find('.pi-name a').attr('href'));
+      innerObj.character.id = extractAnimeId(characterInfo.find('.pi-name a').attr('href') || '') || null;
       innerObj.character.imageUrl = characterInfo.find('.pi-avatar img').attr('src') || null;
       innerObj.character.role = characterInfo.find('.pi-cast').text().trim();
 

@@ -2,13 +2,6 @@
   "version": 2,
   "buildCommand": "npm install && npm run build",
   "outputDirectory": "dist",
-  "env": {
-    "ENABLE_LOGGING": "false"
-  },
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.js"
-    }
-  ]
+  "env": { "ENABLE_LOGGING": "false" },
+  "routes": [{ "src": "/(.*)", "dest": "/api/index.js" }]
 }
