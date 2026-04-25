@@ -1,14 +1,14 @@
 {
   "version": 2,
   "functions": {
-    "api/index.ts": {
-      "includeFiles": "src/**"
+    "api/dist/index.js": {
+      "memory": 1024
     }
   },
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/api/index.ts"
+      "dest": "/api/dist/index.js"
     }
   ]
 }

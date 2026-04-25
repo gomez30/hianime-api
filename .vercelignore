@@ -14,7 +14,7 @@ coverage/
 .nyc_output/
 
 # Build artifacts
-dist/
+# dist/ intentionally not ignored — api/dist/ is the ncc bundle output needed at runtime
 build/
 .cache/
 
@@ -81,7 +81,6 @@ yarn-error.log
 .env.local
 .env.*.local
 build
-dist
 .DS_Store
 render.yaml
 .renderignore

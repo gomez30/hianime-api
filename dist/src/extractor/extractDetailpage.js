@@ -1,0 +1,224 @@
+import { load } from 'cheerio';
+import { extractAnimeId } from '../utils/helpers';
+export const extractDetailpage = (html, pageUrl) => {
+    const $ = load(html);
+    const obj = {
+        title: null,
+        alternativeTitle: null,
+        japanese: null,
+        id: null,
+        poster: null,
+        rating: null,
+        type: null,
+        is18Plus: false,
+        episodes: {
+            sub: null,
+            dub: null,
+            eps: null,
+        },
+        synopsis: null,
+        synonyms: null,
+        aired: {
+            from: null,
+            to: null,
+        },
+        premiered: null,
+        duration: null,
+        status: null,
+        MAL_score: null,
+        genres: [],
+        studios: [],
+        producers: [],
+        moreSeasons: [],
+        related: [],
+        mostPopular: [],
+        recommended: [],
+    };
+    const main = $('.anisc-detail');
+    const moreSeasons = $('#main-content .block_area-seasons');
+    const relatedAndMostPopular = $('#main-sidebar .block_area');
+    const recommended = $('.block_area.block_area_category .tab-content .block_area-content .film_list-wrap .flw-item');
+    obj.poster = main.find('.film-poster img').attr('data-src') || null;
+    obj.is18Plus = Boolean(main.find('.film-poster .tick-rate').length > 0);
+    const titleEl = main.find('.film-name');
+    obj.title = titleEl.text();
+    obj.alternativeTitle = titleEl.attr('data-jname') || null;
+    const info = main.find('.film-stats .tick');
+    obj.rating = info.find('.tick-pg').text();
+    obj.episodes.sub = Number(main.find('.tick-sub').text()) || null;
+    obj.episodes.dub = Number(info.find('.tick-dub').text()) || null;
+    obj.episodes.eps = info.find('.tick-eps').length
+        ? Number(info.find('.tick-eps').text()) || null
+        : Number(main.find('.tick-sub').text()) || null;
+    obj.type = info.find('.item').first().text();
+    if (pageUrl) {
+        obj.id = extractAnimeId(pageUrl) || null;
+    }
+    else {
+        const idLink = main.find('.film-buttons .btn');
+        obj.id = idLink.length ? extractAnimeId(idLink.attr('href') || '') || null : null;
+    }
+    const moreInfo = main.find('.anisc-info-wrap .anisc-info .item');
+    moreInfo.each((i, el) => {
+        const name = $(el).find('.item-head').text();
+        switch (name) {
+            case 'Overview:':
+                obj.synopsis =
+                    $(el).find('.film-description .text').text().trim() ||
+                        $(el).find('[class*="description"]').text().trim() ||
+                        $(el).find('.text').text().trim();
+                break;
+            case 'Japanese:':
+                obj.japanese = $(el).find('.name').text();
+                break;
+            case 'Synonyms:':
+                obj.synonyms = $(el).find('.name').text();
+                break;
+            case 'Aired:': {
+                let aired = $(el).find('.name').text().split('to');
+                obj.aired.from = aired[0].trim();
+                if (aired.length > 1) {
+                    const secondPart = aired[1].trim();
+                    obj.aired.to = secondPart === '?' ? null : secondPart;
+                }
+                else {
+                    obj.aired.to = null;
+                }
+                break;
+            }
+            case 'Premiered:':
+                obj.premiered = $(el).find('.name').text();
+                break;
+            case 'Duration:':
+                obj.duration = $(el).find('.name').text();
+                break;
+            case 'Status:':
+                obj.status = $(el).find('.name').text();
+                break;
+            case 'MAL Score:':
+                obj.MAL_score = $(el).find('.name').text();
+                break;
+            case 'Genres:':
+                obj.genres = $('a[href*="genre"]')
+                    .map((i, genre) => $(genre).text())
+                    .get();
+                break;
+            case 'Studios:':
+                obj.studios = $(el)
+                    .find('a')
+                    .map((i, studio) => extractAnimeId($(studio).attr('href') || '') || $(studio).attr('href')?.split('/').at(-1))
+                    .get();
+                break;
+            case 'Producers:':
+                obj.producers = $(el)
+                    .find('a')
+                    .map((i, producer) => extractAnimeId($(producer).attr('href') || '') || $(producer).attr('href')?.split('/').at(-1))
+                    .get();
+                break;
+            default:
+                break;
+        }
+    });
+    if (moreSeasons.length) {
+        $(moreSeasons)
+            .find('.os-list .os-item')
+            .each((i, el) => {
+            const innerObj = {
+                title: null,
+                alternativeTitle: null,
+                id: null,
+                poster: null,
+                isActive: false,
+            };
+            innerObj.title = $(el).attr('title') || null;
+            innerObj.id = extractAnimeId($(el).attr('href') || '') || null;
+            innerObj.alternativeTitle = $(el).find('.title').text();
+            const posterStyle = $(el).find('.season-poster').attr('style');
+            if (posterStyle) {
+                const match = posterStyle.match(/url\((['"])?(.*?)\1\)/);
+                innerObj.poster = match ? match[2] : null;
+            }
+            innerObj.isActive = $(el).hasClass('active');
+            obj.moreSeasons.push(innerObj);
+        });
+    }
+    const extractRelatedAndMostPopular = (index, array) => {
+        relatedAndMostPopular
+            .eq(index)
+            .find('.cbox .ulclear li')
+            .each((i, el) => {
+            const innerObj = {
+                title: null,
+                alternativeTitle: null,
+                id: null,
+                poster: null,
+                type: null,
+                episodes: {
+                    sub: null,
+                    dub: null,
+                    eps: null,
+                },
+            };
+            const titleEl = $(el).find('.film-name .dynamic-name');
+            innerObj.title = titleEl.text();
+            innerObj.alternativeTitle = titleEl.attr('data-jname') || null;
+            innerObj.id = extractAnimeId(titleEl.attr('href') || '') || null;
+            const infor = $(el).find('.fd-infor .tick');
+            innerObj.type = infor
+                .contents()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .filter((i, el) => {
+                return el.type === 'text' && $(el).text().trim() !== '';
+            })
+                .text()
+                .trim();
+            innerObj.episodes.sub = Number(infor.find('.tick-sub').text()) || null;
+            innerObj.episodes.dub = Number(infor.find('.tick-dub').text()) || null;
+            const epsEl = infor.find('.tick-eps').length
+                ? infor.find('.tick-eps').text()
+                : infor.find('.tick-sub').text();
+            innerObj.episodes.eps = Number(epsEl) || null;
+            innerObj.poster = $(el).find('.film-poster img').attr('data-src') || null;
+            array.push(innerObj);
+        });
+    };
+    if (relatedAndMostPopular.length > 1) {
+        extractRelatedAndMostPopular(0, obj.related);
+        extractRelatedAndMostPopular(1, obj.mostPopular);
+    }
+    else {
+        extractRelatedAndMostPopular(0, obj.mostPopular);
+    }
+    recommended.each((i, el) => {
+        const innerObj = {
+            title: null,
+            alternativeTitle: null,
+            id: null,
+            poster: null,
+            type: null,
+            duration: null,
+            episodes: {
+                sub: null,
+                dub: null,
+                eps: null,
+            },
+            is18Plus: false,
+        };
+        const titleEl = $(el).find('.film-detail .film-name a');
+        innerObj.title = titleEl.text();
+        innerObj.alternativeTitle = titleEl.attr('data-jname') || null;
+        innerObj.id = extractAnimeId(titleEl.attr('href') || '') || null;
+        innerObj.type = $(el).find('.fd-infor .fdi-item').first().text();
+        innerObj.duration = $(el).find('.fd-infor .fdi-duration').text();
+        innerObj.poster = $(el).find('.film-poster img').attr('data-src') || null;
+        innerObj.is18Plus = $(el).find('.film-poster').has('.tick-rate').length > 0;
+        innerObj.episodes.sub = Number($(el).find('.film-poster .tick .tick-sub').text()) || null;
+        innerObj.episodes.dub = Number($(el).find('.film-poster .tick .tick-dub').text()) || null;
+        const epsText = $(el).find('.film-poster .tick .tick-eps').length
+            ? $(el).find('.film-poster .tick .tick-eps').text()
+            : $(el).find('.film-poster .tick .tick-sub').text();
+        innerObj.episodes.eps = Number(epsText) || null;
+        obj.recommended.push(innerObj);
+    });
+    return obj;
+};
