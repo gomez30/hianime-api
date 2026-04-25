@@ -1,8 +1,12 @@
 import config from '../config/config';
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000;
-const TIMEOUT = 10000;
+const DEFAULT_MAX_RETRIES = config.isVercel ? 2 : 3;
+const DEFAULT_RETRY_DELAY = 1000;
+const DEFAULT_TIMEOUT = config.isVercel ? 20000 : 10000;
+
+const MAX_RETRIES = Number(process.env.EXTERNAL_API_RETRIES) || DEFAULT_MAX_RETRIES;
+const RETRY_DELAY = Number(process.env.EXTERNAL_API_RETRY_DELAY_MS) || DEFAULT_RETRY_DELAY;
+const TIMEOUT = Number(process.env.EXTERNAL_API_TIMEOUT_MS) || DEFAULT_TIMEOUT;
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -26,22 +30,24 @@ export const axiosInstance = async (
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
-
-      const response = await fetch(url, {
-        headers: {
-          ...(config.headers || {}),
-          ...customHeaders,
-          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.5',
-          'Accept-Encoding': 'gzip, deflate, br',
-          Connection: 'keep-alive',
-          'Upgrade-Insecure-Requests': '1',
-          'Cache-Control': 'max-age=0',
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          headers: {
+            ...(config.headers || {}),
+            ...customHeaders,
+            Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br',
+            Connection: 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Cache-Control': 'max-age=0',
+          },
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       console.log(`Response status: ${response.status}`);
 
