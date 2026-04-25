@@ -1,7 +1,15 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": "dist",
-  "env": { "ENABLE_LOGGING": "false" },
-  "routes": [{ "src": "/(.*)", "dest": "/api/index.js" }]
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.ts"
+    }
+  ]
 }
