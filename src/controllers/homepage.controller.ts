@@ -21,7 +21,7 @@ const getCachedHomepage = (): HomePage | null => {
 const homepageController = async (): Promise<HomePage> => {
   const startedAt = Date.now();
   console.log('Fetching homepage data from external API...');
-  const result = await axiosInstance('/home');
+  const result = await axiosInstance('/');
 
   if (!result.success) {
     console.error('Homepage fetch failed:', result.message);
