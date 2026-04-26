@@ -1,0 +1,138 @@
+/* Base styles */
+body {
+    background: #000;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+.anime-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.anime-info img {
+    width: 250px;
+    height: 350px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.anime-info div {
+    flex: 1;
+}
+
+.anime-info p {
+    margin: 10px 0;
+}
+
+.watch-btn {
+    display: inline-block;
+    background: linear-gradient(90deg, rgba(236, 72, 153, 1) 0%, rgba(146, 43, 199, 1) 100%);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.watch-btn:hover {
+    background: linear-gradient(90deg, rgba(146, 43, 199, 1) 0%, rgba(236, 72, 153, 1) 100%);
+}
+
+.anime-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.anime-card {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s;
+}
+
+.anime-card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.anime-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-info {
+    padding: 10px;
+}
+
+.card-info h3 {
+    font-size: 1.2rem;
+    margin: 0;
+    color: #e0e0e0;
+}
+
+/* Header and Footer */
+header, footer {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+}
+
+header a, footer a {
+    color: #fff;
+    text-decoration: none;
+}
+
+header a:hover, footer a:hover {
+    text-decoration: underline;
+}
+
+/* Specifics for 'anime-info.php' */
+.anime-info .info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.anime-info .info-section strong {
+    color: #e91e63;
+}
+
+.anime-info .info-section p {
+    margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .anime-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .anime-info img {
+        width: 100%;
+        height: auto;
+    }
+
+    .anime-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}

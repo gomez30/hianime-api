@@ -1,0 +1,188 @@
+<html>
+    <head>
+        <style>
+            /* Footer Styles */
+            footer {
+                background: #111;
+                color: #fff;
+                padding: 20px 0;
+                text-align: center;
+                font-family: 'Arial', sans-serif;
+                height: auto;
+            }
+
+            .footer-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 20px;
+            }
+
+            .footer-container p {
+                font-size: 0.9rem;
+                margin: 5px 0;
+                color: #aaa;
+                line-height: 1.5;
+            }
+
+            .footer-container a {
+                color: #e91e63;
+                text-decoration: none;
+                font-weight: bold;
+                transition: color 0.3s;
+                display : contents;
+            }
+
+            .footer-container a:hover {
+                color: #fff;
+            }
+
+            footer nav {
+                margin-top: 10px;
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+            }
+
+            footer nav a {
+                font-size: 0.95rem;
+                padding: 8px 15px;
+                color: #fff;
+                transition: background 0.3s, color 0.3s;
+                border-radius: 4px;
+                text-transform: uppercase;
+            }
+
+            footer nav a:hover {
+                background: #e91e63;
+                color: #fff;
+            }
+
+            /* Footer Genres Section */
+            .footer-genres {
+                margin-top: 15px;
+                text-align: center;
+            }
+
+            .footer-genres h3 {
+                font-size: 1.2rem;
+                color: #e91e63;
+                margin-bottom: 10px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .footer-genres ul {
+                list-style-type: none;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+
+            .footer-genres li a {
+                color: #fff;
+                text-decoration: none;
+                font-size: 0.9rem;
+                padding: 6px 12px;
+                border-radius: 4px;
+                background: rgba(255, 255, 255, 0.1);
+                transition: background 0.3s, color 0.3s;
+            }
+
+            .footer-genres li a:hover {
+                background: #e91e63;
+                color: #fff;
+            }
+
+            /* Mobile Styles */
+            @media (max-width: 768px) {
+                footer {
+                    padding: 15px 0;
+                }
+
+                .footer-container p {
+                    font-size: 0.85rem;
+                    margin: 2px 0;
+                }
+
+                footer nav {
+                    flex-direction: column;
+                    gap: 10px;
+                    margin-top: 10px;
+                }
+
+                footer nav a {
+                    font-size: 0.95rem;
+                    padding: 10px;
+                    display: block;
+                }
+
+                .footer-genres h3 {
+                    font-size: 1rem;
+                    margin-bottom: 10px;
+                }
+
+                .footer-genres ul {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+
+                .footer-genres li a {
+                    font-size: 0.9rem;
+                    padding: 6px 10px;
+                }
+            }
+
+            /* Extra small screen (phones in portrait mode) */
+            @media (max-width: 480px) {
+                footer {
+                    padding: 10px 0;
+                }
+
+                footer nav a {
+                    font-size: 0.85rem;
+                    padding: 8px;
+                }
+
+                .footer-genres h3 {
+                    font-size: 0.95rem;
+                    margin-bottom: 8px;
+                }
+
+                .footer-genres ul {
+                    padding: 0 10px;
+                }
+
+                .footer-genres li a {
+                    font-size: 0.85rem;
+                    padding: 5px 8px;
+                }
+            }
+
+        </style>
+    </head>
+    <body>
+        <footer>
+            <div class="footer-container">
+                <nav>
+                    <a href="home.php">Home</a> 
+                    
+                    <a href="about.php">About</a>
+                </nav>
+            </div>
+            <div class="footer-genres">
+                <h4>Explore Genres</h4>
+                <ul>
+                    <li><a href="genre.php?name=action&page=1">Action</a> <a href="genre.php?name=shounen&page=1">Shounen</a> <a href="genre.php?name=romance&page=1">Romance</a> <a href="genre.php?name=adventure&page=1">Adventure</a> <a href="genre.php?name=fantasy&page=1">Fantasy</a></li>
+                    <!--<li><a href="genre.php?name=shounen&page=1">Shounen</a></li>-->
+                    <!--<li><a href="genre.php?name=romance&page=1">Romance</a></li>-->
+                    <!--<li><a href="genre.php?name=adventure&page=1">Adventure</a></li>-->
+                    <!--<li><a href="genre.php?name=fantasy&page=1">Fantasy</a></li>-->
+                </ul>
+                <p>Animeobt does not store any files on our server, we only linked to the media which is hosted on 3rd party services.</p>
+            </div>
+            <p>&copy; <?= date('Y') ?> Anime World | Developed by <a href="https://animesobt.great-site.net/home.php" target="_blank">Animeobt</a> Powered by <a href="https://animesobt.great-site.net">AnimeObt</a></p>
+        </footer>
+    </body>
+</html>

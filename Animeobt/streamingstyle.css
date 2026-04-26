@@ -1,0 +1,116 @@
+/* Global Reset & Box Sizing */
+* {
+  box-sizing: border-box;
+}
+
+/* Base Styles */
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  color: #fff;
+  font-family: 'Montserrat', Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/* Container & Typography */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #e91e63;
+  text-align: center;
+}
+.section-title {
+  font-size: 1.8rem;
+  background: #333;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Episode List Styles */
+.episode-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Episode Item */
+.episode-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 15px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #fff;
+  transition: background 0.3s ease, transform 0.2s;
+}
+.episode-item:hover {
+  background: #e91e63;
+  transform: translateX(5px);
+}
+
+/* Episode Number & Title */
+.episode-number {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+.episode-title {
+  font-size: 1rem;
+}
+
+/* Filler Tag */
+.filler-tag {
+  background: #ff9800;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* Sentinel styling (optional: hidden element to trigger lazy loading) */
+#sentinel {
+  height: 1px;
+}
+
+/* Header and Footer (if using same design) */
+header, footer {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  text-align: center;
+}
+header a, footer a {
+  color: #fff;
+  text-decoration: none;
+}
+header a:hover, footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+  .section-title {
+    font-size: 1.5rem;
+  }
+  .episode-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .episode-item span {
+    margin-bottom: 5px;
+  }
+}

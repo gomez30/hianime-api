@@ -1,0 +1,150 @@
+/* General Styles for Genre Page */
+.genre-page {
+    padding: 40px;
+    background-color: #f5f5f5;
+}
+
+.genre-page h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+/* Anime Grid for Genre Page */
+.animes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));  /* Flexible grid that adjusts based on screen size */
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.anime-card {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    overflow: hidden; /* Prevents overflow for images */
+}
+
+.anime-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.anime-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;  /* Ensures images are well-cropped */
+}
+
+.anime-card h3 {
+    font-size: 20px;
+    margin-top: 10px;
+    color: #444;
+}
+
+.anime-card p {
+    font-size: 14px;
+    color: #777;
+    margin-top: 5px;
+}
+
+/* Pagination for Genre Page */
+.pagination {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.pagination a {
+    padding: 12px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 0 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.pagination a:hover {
+    background-color: #0056b3;
+}
+
+/* Genre Filters */
+.genre-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.genre-filters .filter {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+}
+
+.genre-filters .filter:hover {
+    background-color: #0056b3;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .genre-page h1 {
+        font-size: 28px;
+    }
+
+    .animes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .anime-card h3 {
+        font-size: 18px;
+    }
+
+    .anime-card p {
+        font-size: 12px;
+    }
+
+    .pagination a {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .genre-page {
+        padding: 20px;
+    }
+
+    .genre-page h1 {
+        font-size: 24px;
+    }
+
+    .animes-grid {
+        grid-template-columns: 1fr; /* Stack anime cards in a single column on small screens */
+    }
+
+    .pagination a {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .genre-filters {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .genre-filters .filter {
+        margin-bottom: 10px;
+    }
+}

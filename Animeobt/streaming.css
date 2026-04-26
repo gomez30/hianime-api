@@ -1,0 +1,26 @@
+.hidden {
+    display: none;
+}
+
+.collapsible {
+    cursor: pointer;
+    background-color: #f4f4f4;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    color: #333;
+    transition: background-color 0.3s;
+}
+
+.collapsible:hover {
+    background-color: #e8e8e8;
+}
+
+.episode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin-top: 10px;
+}
