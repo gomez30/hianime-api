@@ -62,11 +62,11 @@ const filterController = async (c: Context): Promise<ListPageResponse> => {
 
   if (pageNum > 1) params.set('page', String(pageNum));
 
-  const endpoint = keyword ? '/search' : '/filter';
+  const endpoint = '/filter';
   const queryString = params.toString();
   const url = queryString ? `${endpoint}?${queryString}` : endpoint;
 
-  const result = await axiosInstance(url);
+  const result = await axiosInstance(url, { timeoutMs: 30000, retries: 1 });
 
   console.log(result.message);
 

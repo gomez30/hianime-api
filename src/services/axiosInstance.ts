@@ -63,9 +63,19 @@ const classifyBlockedPage = (data: string): string | null => {
 
 export const axiosInstance = async (
   endpoint: string,
-  options: { headers?: Record<string, string>; retries?: number } = {}
+  options: {
+    headers?: Record<string, string>;
+    retries?: number;
+    timeoutMs?: number;
+    expectHtml?: boolean;
+  } = {}
 ) : Promise<AxiosResult> => {
-  const { headers: customHeaders = {}, retries = MAX_RETRIES } = options;
+  const {
+    headers: customHeaders = {},
+    retries = MAX_RETRIES,
+    timeoutMs = TIMEOUT,
+    expectHtml = true,
+  } = options;
   const baseUrls = buildBaseUrlCandidates();
   const maxAttempts = Math.max(1, retries);
   let lastError = null;
@@ -90,7 +100,7 @@ export const axiosInstance = async (
         console.log(`Fetching (attempt ${attempt + 1}/${maxAttempts}) from ${url}`);
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
         let response: Response;
         try {
           response = await fetch(url, {
@@ -141,7 +151,7 @@ export const axiosInstance = async (
           throw new Error(blockReason);
         }
 
-        if (!trimmed.includes('<html') && !trimmed.includes('<!DOCTYPE html')) {
+        if (expectHtml && !trimmed.includes('<html') && !trimmed.includes('<!DOCTYPE html')) {
           throw new Error('Unexpected non-HTML upstream response');
         }
 
@@ -182,7 +192,7 @@ export const axiosInstance = async (
 
           if (error.name === 'AbortError') {
             lastError = new Error(
-              `Request timeout after ${TIMEOUT}ms while contacting upstream: ${baseUrl}${endpoint}`
+              `Request timeout after ${timeoutMs}ms while contacting upstream: ${baseUrl}${endpoint}`
             );
           }
 
@@ -205,7 +215,7 @@ export const axiosInstance = async (
       endpoint,
       baseUrlsTried: baseUrls,
       attemptsTried,
-      timeoutMs: TIMEOUT,
+      timeoutMs,
       diagnostics: attemptDiagnostics,
     },
   };

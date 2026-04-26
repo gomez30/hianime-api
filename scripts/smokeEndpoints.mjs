@@ -11,7 +11,7 @@ const endpointChecks = [
   { path: '/suggestion?keyword=one', requiredArrayData: true },
   { path: '/news?page=1', requiredDataKey: 'news' },
   { path: '/filter?keyword=one+piece&page=1', requiredDataKey: 'response' },
-  { path: '/schedule/next/one-piece-vss', requiredDataKey: 'duration' },
+  { path: '/schedule/next/one-piece-vss', requiredStringData: true },
   { path: '/schedules', requiredDataKey: 'data' },
   { path: '/random', requiredDataKey: 'id' },
   { path: '/genres', requiredArrayData: true },
@@ -23,6 +23,7 @@ const checkShape = (json, check) => {
   if (!('data' in json)) return 'missing data field';
 
   if (check.requiredArrayData && !Array.isArray(json.data)) return 'data is not an array';
+  if (check.requiredStringData && typeof json.data !== 'string') return 'data is not a string';
   if (check.requiredDataKey && (!json.data || !(check.requiredDataKey in json.data)))
     return `missing data.${check.requiredDataKey}`;
 

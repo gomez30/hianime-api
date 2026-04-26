@@ -27,6 +27,9 @@ const episodesController = async (c: Context): Promise<Episode[]> => {
 
   const episodesResult = await axiosInstance(`/wp-json/v1/episode/list/${internalId}`, {
     headers: { Accept: 'application/json, text/plain, */*' },
+    expectHtml: false,
+    timeoutMs: 30000,
+    retries: 1,
   });
 
   if (!episodesResult.success || !episodesResult.data) {

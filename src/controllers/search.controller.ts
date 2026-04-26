@@ -13,7 +13,7 @@ const searchController = async (c: Context): Promise<ListPageResponse> => {
 
   // New upstream now serves keyword search through /filter instead of /search
   const endpoint = `/filter?keyword=${noSpaceKeyword}&page=${page}`;
-  const result = await axiosInstance(endpoint);
+  const result = await axiosInstance(endpoint, { timeoutMs: 30000, retries: 1 });
 
   if (!result.success || !result.data) {
     throw new AppError(result.message || 'Failed to fetch search page', 502, result.details ?? null);

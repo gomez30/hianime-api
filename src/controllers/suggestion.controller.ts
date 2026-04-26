@@ -12,6 +12,9 @@ const suggestionController = async (c: Context): Promise<Suggestion[]> => {
   const endpoint = `/wp-json/hianime/v1/search/suggestions?keyword=${noSpaceKeyword}`;
   const result = await axiosInstance(endpoint, {
     headers: { Accept: 'application/json, text/plain, */*' },
+    expectHtml: false,
+    timeoutMs: 30000,
+    retries: 1,
   });
 
   if (!result.success || !result.data) {

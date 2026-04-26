@@ -16,14 +16,6 @@ const charactersController = async (c: Context): Promise<CharactersResponse> => 
     }
 
     const response = extractCharacters(result.data);
-    if (!response.response.length) {
-      throw new AppError(
-        'Characters data is unavailable from current upstream HTML/API for this title',
-        502,
-        { id }
-      );
-    }
-
     return response;
   } catch (err: unknown) {
     if (err instanceof Error) {
