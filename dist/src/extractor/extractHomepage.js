@@ -44,15 +44,17 @@ export const extractHomepage = (html) => {
             },
         };
         const anchors = $(el).find('a').toArray();
+        const episodeHref = anchors[0] ? $(anchors[0]).attr('href') || '' : '';
         const animeHref = anchors[1] ? $(anchors[1]).attr('href') || '' : '';
         obj.id = extractAnimeId(animeHref) || null;
         obj.poster = $(el).find('.deslide-cover-img img.film-poster-img').attr('data-src') || null;
-        const titles = $(el).find('.desi-head-title');
-        obj.title = titles.text();
+        const titles = $(el).find('.desi-head-title').first();
+        const fallbackTitle = extractAnimeId(episodeHref).replace(/-/g, ' ').trim();
+        obj.title = (titles.text() || '').trim() || (fallbackTitle || null);
         obj.alternativeTitle = titles.attr('data-jname') || null;
         obj.synopsis = $(el).find('.desi-description').text().trim();
         const rankText = $(el).find('[class*="rank"]').text().trim();
-        obj.rank = parseInt(rankText) || i + 1;
+        obj.rank = parseInt(rankText.replace(/[^0-9]/g, '')) || i + 1;
         const details = $(el).find('.sc-detail');
         obj.type = details.find('.scd-item').eq(0).text().trim();
         obj.duration = details.find('.scd-item').eq(1).text().trim();
@@ -60,9 +62,10 @@ export const extractHomepage = (html) => {
         obj.quality = details.find('.scd-item .quality').text().trim();
         obj.episodes.sub = Number(details.find('.tick-sub').text().trim()) || null;
         obj.episodes.dub = Number(details.find('.tick-dub').text().trim()) || null;
-        const epsText = details.find('.tick-eps').length
+        const epsNodeText = details.find('.tick-eps').length
             ? details.find('.tick-eps').text().trim()
-            : details.find('.tick-sub').text().trim();
+            : details.find('[class*="tick"], [class*="ep"]').first().text().trim();
+        const epsText = epsNodeText.replace(/[^0-9]/g, '');
         obj.episodes.eps = Number(epsText) || null;
         response.spotlight.push(obj);
     });
@@ -77,7 +80,7 @@ export const extractHomepage = (html) => {
         const rankText = $(el).find('.number span').text().trim();
         obj.rank = parseInt(rankText) || i + 1;
         const titleEl = $(el).find('.film-title.dynamic-name');
-        obj.title = titleEl.attr('data-en') || null;
+        obj.title = titleEl.attr('data-en') || titleEl.text().trim() || null;
         obj.alternativeTitle = titleEl.attr('data-jname') || null;
         const imageEl = $(el).find('a.film-poster');
         obj.poster = imageEl.find('img').attr('data-src') || null;

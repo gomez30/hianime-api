@@ -1,22 +1,20 @@
-import config from '../config/config';
-import { validationError } from '../utils/errors';
+import { AppError, validationError } from '../utils/errors';
 import { extractCharacters } from '../extractor/extractCharacters';
 import { axiosInstance } from '../services/axiosInstance';
 const charactersController = async (c) => {
     try {
         const id = c.req.param('id');
-        const page = c.req.query('page') || '1';
         if (!id)
             throw new validationError('id is required');
-        const idNum = id.split('-').pop();
-        const endpoint = `/ajax/character/list/${idNum}?page=${page}`;
-        const result = await axiosInstance(endpoint, {
-            headers: { Referer: `${config.baseurl}/home` },
-        });
+        // Character block is available in anime detail HTML on current upstream.
+        const result = await axiosInstance(`/anime/${id}`);
         if (!result.success || !result.data) {
-            throw new validationError(result.message || 'characters not found');
+            throw new AppError(result.message || 'Failed to fetch characters', 502, result.details ?? null);
         }
         const response = extractCharacters(result.data);
+        if (!response.response.length) {
+            throw new AppError('Characters data is unavailable from current upstream HTML/API for this title', 502, { id });
+        }
         return response;
     }
     catch (err) {
@@ -26,7 +24,7 @@ const charactersController = async (c) => {
         else {
             console.log(err);
         }
-        throw new validationError('characters not found');
+        throw new AppError('characters not found', 502);
     }
 };
 export default charactersController;

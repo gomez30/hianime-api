@@ -1,16 +1,16 @@
 import { Context } from 'hono';
 import { extractCharacterDetail, CharacterDetail } from '../extractor/extractCharacterDetail';
 import { axiosInstance } from '../services/axiosInstance';
-import { validationError } from '../utils/errors';
+import { AppError, validationError } from '../utils/errors';
 
 const characterDetailConroller = async (c: Context): Promise<CharacterDetail> => {
   const id = c.req.param('id');
 
   if (!id) throw new validationError('id is required');
 
-  const result = await axiosInstance(`/${id.replace(':', '/')}`);
+  const result = await axiosInstance(`/character/${id.replace(':', '/')}`);
   if (!result.success || !result.data) {
-    throw new validationError(result.message || 'make sure given endpoint is correct');
+    throw new AppError(result.message || 'Failed to fetch character detail', 502, result.details ?? null);
   }
 
   const response = extractCharacterDetail(result.data);

@@ -4,7 +4,8 @@ export const extractSuggestions = (html) => {
     const $ = load(html);
     const response = [];
     const allEl = $('.nav-item');
-    const items = allEl.toArray().splice(0, allEl.length - 2);
+    const listFallback = $('.flw-item');
+    const items = allEl.length > 0 ? allEl.toArray().slice(0, Math.max(0, allEl.length - 2)) : listFallback.toArray();
     $(items).each((i, el) => {
         const obj = {
             title: null,
@@ -15,14 +16,14 @@ export const extractSuggestions = (html) => {
             type: null,
             duration: null,
         };
-        const href = $(el).attr('href') || '';
+        const href = $(el).attr('href') || $(el).find('.film-name a').attr('href') || '';
         obj.id = extractAnimeId(href) || null;
         obj.poster = $(el).find('.film-poster img').attr('data-src') || null;
         const titleEL = $(el).find('.film-name');
-        obj.title = titleEL.text() || null;
+        obj.title = titleEL.text().trim() || null;
         obj.alternativeTitle = titleEL.attr('data-jname') || null;
         const infoEl = $(el).find('.film-infor');
-        obj.aired = infoEl.find('span').first().text() || null;
+        obj.aired = infoEl.find('span').first().text().trim() || null;
         obj.type = infoEl
             .contents()
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,7 +32,7 @@ export const extractSuggestions = (html) => {
         })
             .text()
             .trim();
-        obj.duration = infoEl.find('span').last().text() || null;
+        obj.duration = infoEl.find('span').last().text().trim() || null;
         response.push(obj);
     });
     return response;

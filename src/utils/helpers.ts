@@ -15,3 +15,20 @@ export function extractAnimeId(url: string): string {
     .replace(/-ep-\d+.*$/i, '')
     .replace(/-english-(sub|dub).*$/i, '');
 }
+
+export function extractAnimeInternalIdFromHtml(html: string): string | null {
+  if (!html) return null;
+
+  // Main anime poster block usually carries internal numeric data-id used by wp-json/v1 APIs.
+  const directMainPosterMatch = html.match(
+    /class=["'][^"']*anisc-poster[^"']*["'][\s\S]*?data-id=["'](\d+)["']/i
+  );
+  if (directMainPosterMatch?.[1]) return directMainPosterMatch[1];
+
+  const fallbackPosterMatch = html.match(
+    /class=["'][^"']*film-poster[^"']*item-qtip[^"']*["'][\s\S]*?data-id=["'](\d+)["']/i
+  );
+  if (fallbackPosterMatch?.[1]) return fallbackPosterMatch[1];
+
+  return null;
+}

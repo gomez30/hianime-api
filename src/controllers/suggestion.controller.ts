@@ -1,6 +1,5 @@
 import { Context } from 'hono';
-import config from '../config/config';
-import { validationError } from '../utils/errors';
+import { AppError, validationError } from '../utils/errors';
 import { extractSuggestions, Suggestion } from '../extractor/extractSuggestions';
 import { axiosInstance } from '../services/axiosInstance';
 
@@ -10,21 +9,24 @@ const suggestionController = async (c: Context): Promise<Suggestion[]> => {
   if (!keyword) throw new validationError('query is required');
 
   const noSpaceKeyword = keyword.trim().toLowerCase().replace(/\s+/g, '+');
-  const endpoint = `/ajax/search/suggest?keyword=${noSpaceKeyword}`;
-
+  const endpoint = `/wp-json/hianime/v1/search/suggestions?keyword=${noSpaceKeyword}`;
   const result = await axiosInstance(endpoint, {
-    headers: { Referer: `${config.baseurl}/home` },
+    headers: { Accept: 'application/json, text/plain, */*' },
   });
 
   if (!result.success || !result.data) {
-    throw new validationError(result.message || 'suggestion not found');
+    throw new AppError(result.message || 'suggestion not found', 502, result.details ?? null);
   }
 
-  // Parse HTML from JSON if necessary, or just use result.data if it's already HTML
-  // In hianime API, suggestion ajax usually returns JSON with { status, html }
-  // but my axiosInstance returns response.text() which is the raw JSON string.
-  const jsonData = JSON.parse(result.data);
-  const response = extractSuggestions(jsonData.html);
+  let html = result.data;
+  try {
+    const parsed = JSON.parse(result.data) as { html?: string };
+    if (parsed?.html) html = parsed.html;
+  } catch {
+    // keep plain html fallback
+  }
+
+  const response = extractSuggestions(html).slice(0, 12);
 
   return response;
 };
