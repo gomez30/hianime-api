@@ -20,8 +20,26 @@ const getCachedHomepage = (): HomePage | null => {
 
 const homepageController = async (): Promise<HomePage> => {
   const startedAt = Date.now();
-  console.log('Fetching homepage data from external API...');
-  const result = await axiosInstance('/');
+  const homepageEndpoints = ['/', '/home'];
+  console.log(
+    `Fetching homepage data from external API (candidates: ${homepageEndpoints.join(', ')})...`
+  );
+
+  let result = await axiosInstance(homepageEndpoints[0]);
+  if (!result.success) {
+    for (let i = 1; i < homepageEndpoints.length; i++) {
+      const fallbackEndpoint = homepageEndpoints[i];
+      console.warn(
+        `Primary homepage endpoint failed (${homepageEndpoints[0]}). Trying fallback ${fallbackEndpoint}...`
+      );
+      const fallbackResult = await axiosInstance(fallbackEndpoint);
+      if (fallbackResult.success) {
+        result = fallbackResult;
+        break;
+      }
+      result = fallbackResult;
+    }
+  }
 
   if (!result.success) {
     console.error('Homepage fetch failed:', result.message);
@@ -65,7 +83,7 @@ const homepageController = async (): Promise<HomePage> => {
     }
 
     throw new AppError('Upstream HTML structure changed or response was blocked', 502, {
-      endpoint: '/home',
+      endpointsTried: homepageEndpoints,
       upstreamMeta: result.meta,
       parseDurationMs,
       totalDurationMs,

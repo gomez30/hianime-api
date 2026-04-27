@@ -103,6 +103,7 @@ export const axiosInstance = async (
         const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
         let response: Response;
         try {
+          const referer = `${baseUrl}/`;
           response = await fetch(url, {
             headers: {
               ...(config.headers || {}),
@@ -113,6 +114,13 @@ export const axiosInstance = async (
               Connection: 'keep-alive',
               'Upgrade-Insecure-Requests': '1',
               'Cache-Control': 'max-age=0',
+              Referer: referer,
+              Origin: baseUrl,
+              'Sec-Fetch-Dest': 'document',
+              'Sec-Fetch-Mode': 'navigate',
+              'Sec-Fetch-Site': 'same-origin',
+              'Sec-Fetch-User': '?1',
+              DNT: '1',
             },
             signal: controller.signal,
           });
