@@ -9,6 +9,9 @@ const suggestionController = async (c) => {
     const endpoint = `/wp-json/hianime/v1/search/suggestions?keyword=${noSpaceKeyword}`;
     const result = await axiosInstance(endpoint, {
         headers: { Accept: 'application/json, text/plain, */*' },
+        expectHtml: false,
+        timeoutMs: 30000,
+        retries: 1,
     });
     if (!result.success || !result.data) {
         throw new AppError(result.message || 'suggestion not found', 502, result.details ?? null);

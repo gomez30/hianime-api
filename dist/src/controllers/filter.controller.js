@@ -48,10 +48,10 @@ const filterController = async (c) => {
     });
     if (pageNum > 1)
         params.set('page', String(pageNum));
-    const endpoint = keyword ? '/search' : '/filter';
+    const endpoint = '/filter';
     const queryString = params.toString();
     const url = queryString ? `${endpoint}?${queryString}` : endpoint;
-    const result = await axiosInstance(url);
+    const result = await axiosInstance(url, { timeoutMs: 30000, retries: 1 });
     console.log(result.message);
     if (!result.success || !result.data)
         throw new validationError(result.message || 'something went wrong will queries');

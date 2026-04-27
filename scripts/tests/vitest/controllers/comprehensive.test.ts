@@ -64,7 +64,16 @@ describe('Controllers Comprehensive Suite', () => {
   });
 
   it('episodesController should return episodes', async () => {
-    mockSuccess(mockHtmlData.episodes);
+    (axiosInstance as Mock)
+      .mockResolvedValueOnce({ success: true, data: `<a href="/anime/123"></a>` })
+      .mockResolvedValueOnce({ success: true, data: mockHtmlData.search })
+      .mockResolvedValueOnce({ success: true, data: `<div class="anisc-poster" data-id="123"></div>` })
+      .mockResolvedValueOnce({
+        success: true,
+        data: `
+          <a class="ssl-item ep-item" href="/watch/123-episode-1-english-subbed?ep=1" title="Episode 1"></a>
+        `,
+      });
     const result = await episodesController(createMockContext({ id: '123' }));
     expect(result).toHaveLength(1);
   });

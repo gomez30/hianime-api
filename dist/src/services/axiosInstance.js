@@ -31,7 +31,7 @@ const classifyBlockedPage = (data) => {
     return null;
 };
 export const axiosInstance = async (endpoint, options = {}) => {
-    const { headers: customHeaders = {}, retries = MAX_RETRIES } = options;
+    const { headers: customHeaders = {}, retries = MAX_RETRIES, timeoutMs = TIMEOUT, expectHtml = true, } = options;
     const baseUrls = buildBaseUrlCandidates();
     const maxAttempts = Math.max(1, retries);
     let lastError = null;
@@ -50,7 +50,7 @@ export const axiosInstance = async (endpoint, options = {}) => {
                 }
                 console.log(`Fetching (attempt ${attempt + 1}/${maxAttempts}) from ${url}`);
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
+                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
                 let response;
                 try {
                     response = await fetch(url, {
@@ -94,7 +94,7 @@ export const axiosInstance = async (endpoint, options = {}) => {
                 if (blockReason) {
                     throw new Error(blockReason);
                 }
-                if (!trimmed.includes('<html') && !trimmed.includes('<!DOCTYPE html')) {
+                if (expectHtml && !trimmed.includes('<html') && !trimmed.includes('<!DOCTYPE html')) {
                     throw new Error('Unexpected non-HTML upstream response');
                 }
                 console.log(`Success: Received data length: ${data.length}`);
@@ -128,7 +128,7 @@ export const axiosInstance = async (endpoint, options = {}) => {
                     });
                     console.error(`Fetch error (attempt ${attempt + 1}/${maxAttempts}) for ${endpoint} via ${baseUrl}:`, error.message);
                     if (error.name === 'AbortError') {
-                        lastError = new Error(`Request timeout after ${TIMEOUT}ms while contacting upstream: ${baseUrl}${endpoint}`);
+                        lastError = new Error(`Request timeout after ${timeoutMs}ms while contacting upstream: ${baseUrl}${endpoint}`);
                     }
                     if (error.message.includes('HTTP 40') && !error.message.includes('429')) {
                         break;
@@ -147,7 +147,7 @@ export const axiosInstance = async (endpoint, options = {}) => {
             endpoint,
             baseUrlsTried: baseUrls,
             attemptsTried,
-            timeoutMs: TIMEOUT,
+            timeoutMs,
             diagnostics: attemptDiagnostics,
         },
     };
